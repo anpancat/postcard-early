@@ -3,7 +3,7 @@ import { db, collection, addDoc } from "./firebaseConfig"; // firebase 인증 �
 
 const getReturnURL = () => {
   const params = new URLSearchParams(window.location.search);
-  return params.get("return") || "퀄트릭스 링크크";
+  return params.get("return") || "퀄트릭스 링크";
 };
 
 export default function WritingTest() {
@@ -28,7 +28,7 @@ export default function WritingTest() {
   const [preTextTyping, setPreTextTyping] = useState("");   // 타이핑 중인 글자
 
   const typingText = "...DraftMind가 입력중 입니다..."; //입력중
-  const hello = "안녕하세요! 저는 글쓰기를 도와주기 위해 만들어진 AI 'DraftMind' 이에요. \n당신은 지금 미래의 당신에게 편지를 작성 중인 것으로 보이네요."; // 인사말
+  const hello = "안녕하세요! 저는 글쓰기 전문 AI 'DraftMind'에요. \n당신은 지금 미래의 '나'에게 편지를 쓰고 있군요."; // 인사말
   const fullText = "편지를 잘 쓸 수 있도록, 이번 파트에서는 제가 도와줄게요!"; // AI 글쓰기 제안문구
   const examplePhrase = ["따스한 햇살이", "골목길을 비추고", "나뭇잎 사이로 부는 바람이", "잔잔한 소리를 냈다", "담벼락에는 고양이가 졸고 있었고", "창문 너머로", "김이 서린 찻잔이 보였다", "조용한 거리에", "어울리지 않게", "어디선가 작은 발소리가 들려오고", "고개를 들어", "소리가 난 곳을 찾아 두리번거리자", "멀리서 낯선 그림자를 발견했다"];  // 예시 구문들
   const exampleKeywords = ["따스한", "햇살", "골목길", "비추고", "나뭇잎", "사이", "부는", "바람", "잔잔한", "소리", "냈다", "담벼락", "고양이", "졸고", "있었고", "창문", "너머", "김", "서린", "찻잔", "보였다", "조용한", "거리", "어울리지", "않게", "어디선가", "작은", "발소리", "들려오고", "고개", "들어", "소리", "난", "곳", "찾아", "두리번거리자", "멀리서", "낯선", "그림자", "발견했다"]; // 예시 단어들
@@ -45,6 +45,9 @@ export default function WritingTest() {
   const [showInputLockMessage, setShowInputLockMessage] = useState(false);
 
   const [warning, setWarning] = useState("");
+
+  const [isPressed, setIsPressed] = useState(false);
+
 
   // ✨ Prolific ID 상태 추가
   const [prolificId, setProlificId] = useState("");
@@ -167,7 +170,6 @@ export default function WritingTest() {
         handleChange(finalText); // 경고 검사를 다시 실행
 
         setIsPreTextTyping(false);
-        setIsInputDisabled(false);   // 타이핑 끝난 후 입력창 활성화
       }, 1000);
     }
   }, [isPreTextTyping, preTextIndex]);
@@ -198,9 +200,9 @@ export default function WritingTest() {
         setIsPreTextTyping(false);
         setIsInputDisabled(true);
         setHasTriggeredOnce(true);  // 이게 true가 되면 typingText 타이핑이 시작됨
+      } else {
+        setIsInputDisabled(false); // ✅ 사용자가 다음으로 넘어갈 때만 활성화
       }
-
-
     } else {
       setCurrentInput("");
       setCurrentWordCount(0);
@@ -304,14 +306,15 @@ export default function WritingTest() {
       {/* 제목 및 안내 */}
       <div style={{ width: "80%", textAlign: "left", marginBottom: "5px", fontSize: "18px" }}> 
         <h1>📝 미래의 나에게 편지 쓰기</h1>
-        <p style = {{ fontSize: "18px", marginBottom: "-10px"}}> 다음과 같은 순서로 미래의 나에게 편지를 작성해주세요 (각 섹션당 30단어 이상)</p>
+        <p style = {{ fontSize: "18px", marginBottom: "-5px"}}> 다음과 같은 순서로 미래의 나에게 편지를 작성해주세요 (한 파트 당 30단어 이상)</p>
         <div style={{ lineHeight: "1.5"}}>
-          <p style={{ fontSize: "16px", marginBottom: "-15px" }}>1. 인사말/지금의 나</p>
-          <p style={{ fontSize: "16px", marginBottom: "-15px" }}>2. 미래의 나에게 하는 약속</p>
-          <p style={{ fontSize: "16px", marginBottom: "-15px" }}>3. 잊고 싶지 않은 생각</p>
-          <p style={{ fontSize: "16px", marginBottom: "-15px" }}>4. 내가 배운 것</p>
-          <p style={{ fontSize: "16px", marginBottom: "-15px" }}>5. 미래의 나에게 하고 싶은 말</p>
+          <p style={{ color: "dimgray", fontSize: "16px", marginBottom: "-15px" }}>1. 인사말/지금의 나</p>
+          <p style={{ color: "dimgray", fontSize: "16px", marginBottom: "-15px" }}>2. 미래의 나에게 하는 약속</p>
+          <p style={{ color: "dimgray", fontSize: "16px", marginBottom: "-15px" }}>3. 잊고 싶지 않은 생각</p>
+          <p style={{ color: "dimgray", fontSize: "16px", marginBottom: "-15px" }}>4. 내가 배운 것</p>
+          <p style={{ color: "dimgray", fontSize: "16px", marginBottom: "0px" }}>5. 미래의 나에게 하고 싶은 말</p>
         </div>
+        <p style = {{ color: "darkred", fontSize: "16px", marginBottom: "-15px"}}> 30단어 이상을 작성한 후 '다음 순서로 넘어가기' 버튼을 누르면 다음 파트로 넘어갈 수 있습니다. 총 5개의 파트를 모두 마친 후 제출하기 버튼을 눌러주세요!</p>
       </div>
 
       {/* 실시간 반영 편지지 */}
@@ -363,7 +366,9 @@ export default function WritingTest() {
           />
           {showInputLockMessage && (
             <p style={{ color: "gray", fontWeight: "bold", fontSize: "14px", marginTop: "5px" }}>
-              ✨ DraftMind가 입력중입니다. 잠시만 기다려주세요...
+              {preTextTyping.length < predefinedText.length
+              ? "✨ DraftMind가 입력중입니다. 잠시만 기다려주세요..."
+              : "🪄 DraftMind의 입력이 완료되었습니다!"}
             </p>
           )}
         </div>
@@ -372,25 +377,59 @@ export default function WritingTest() {
       {/* 단어 수 및 경고 */}
       <div style={{ width: "80%", marginTop: "-15px"}}>
         {/* 단어 수 + 완료 메시지 */}
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px", marginTop: "10px", marginLeft: "10px", flexWrap: "wrap" }}>
           <p style={{
             color: currentWordCount >= 30 ? "green" : "black",
             fontWeight: currentWordCount >= 30 ? "bold" : "normal",
             fontSize: "16px",
-            marginBottom: "5px"
+            margin: 0
           }}>
             {currentWordCount}/30 단어
           </p>
 
           {currentWordCount >= 30 && (
+            currentSectionIndex < sections.length - 1 ? (
+            <>
+              <p style={{
+                color: "green",
+                fontWeight: "bold",
+                fontSize: "16px",
+                margin: 0
+              }}>
+                ✅ 필요한 단어수가 채워졌습니다.
+              </p>
+
+              <button 
+                onClick={handleNextSection}
+                onMouseDown={() => setIsPressed(true)}
+                onMouseUp={() => setIsPressed(false)}
+                onMouseLeave={() => setIsPressed(false)}
+                style={{
+                  padding: "5px 12px",
+                  backgroundColor: isPressed ? "#4CAF50" : "#45a049",
+                  color: "white",
+                  border: "1px solid #3e8e41",
+                  borderRadius: "4px",
+                  marginTop: "10px",
+                  fontSize: "15px",
+                  fontWeight: "500",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease"
+                }}
+              >
+                다음 파트로 넘어가기
+              </button>
+            </>
+            ) : (
             <p style={{
-              color: "green",
+              color: "#007bff",
               fontWeight: "bold",
               fontSize: "16px",
-              marginBottom: "5px"
+              marginTop: "15px"
             }}>
-              ✅ 필요한 단어수가 채워졌습니다.
+              💡 편지에 필요한 내용이 모두 작성되었습니다! 아래 제출 버튼을 눌러주세요.
             </p>
+            )
           )}
         </div>
 
@@ -401,19 +440,6 @@ export default function WritingTest() {
               <p key={index} style={{ margin: "4px 0" }}>❌ {msg}</p>
             ))}
           </div>
-        )}
-
-        {/* 다음 버튼 */}
-        {currentWordCount >= 30 && (
-          currentSectionIndex < sections.length - 1 ? (
-            <button onClick={handleNextSection}>
-              다음 순서로 넘어가기
-            </button>
-          ) : (
-            <p style={{ fontWeight: "bold", marginTop: "10px", fontSize: "16px" }}>
-              ✉️ 편지 내용이 모두 작성되었습니다. 아래 제출 버튼을 눌러주세요.
-            </p>
-          )
         )}
       </div>
 
@@ -501,8 +527,8 @@ export default function WritingTest() {
       </span>
     </div>
 
-    <span style={{ marginTop: "10px", fontSize: "18px", color: "gray" }}>
-    🔔편지를 제출한 후 반드시 설문을 완료해주세요.
+    <span style={{ marginTop: "10px", fontSize: "15px", color: "gray" }}>
+    🔔제출버튼을 누르면 1~2초 후 제출이 완료되며, 자동으로 설문으로 넘어갑니다. 설문을 완료해주세요.
     </span>
 
     {/* Submit 버튼 - 가장 아래로 배치 */}
